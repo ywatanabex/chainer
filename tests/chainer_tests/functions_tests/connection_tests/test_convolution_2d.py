@@ -20,9 +20,11 @@ def _asfortranarray(x):
         return xp.ascontiguousarray(x.T).T
 
 
-@testing.parameterize(*testing.product({
-    'c_contiguous': [True, False],
-}))
+@testing.parameterize(
+    {'h': 4, 'w': 3, 'pad': 1, 'c_contiguous': True},
+    {'h': 4, 'w': 3, 'pad': 1, 'c_contiguous': False},
+    {'h': 10, 'w': 8, 'pad': -1, 'c_contiguous': True},
+)
 class TestConvolution2DFunction(unittest.TestCase):
 
     def setUp(self, use_cudnn=True):
@@ -38,10 +40,12 @@ class TestConvolution2DFunction(unittest.TestCase):
         self.b = numpy.random.uniform(
             -1, 1, out_channels).astype(numpy.float32)
 
-        self.x = numpy.random.uniform(-1, 1,
-                                      (2, 3, 4, 3)).astype(numpy.float32)
-        self.gy = numpy.random.uniform(-1, 1,
-                                       (2, 2, 2, 2)).astype(numpy.float32)
+        oh = (self.h + 2 * self.pad - 3) // 2 + 1
+        ow = (self.w + 2 * self.pad - 3) // 2 + 1
+        shape = (2, 3, self.h, self.w)
+        out_shape = (2, 2, oh, ow)
+        self.x = numpy.random.uniform(-1, 1, shape).astype(numpy.float32)
+        self.gy = numpy.random.uniform(-1, 1, out_shape).astype(numpy.float32)
 
     @attr.cudnn
     def test_forward_consistency(self, nobias=False):
