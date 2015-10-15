@@ -503,7 +503,10 @@ class ndarray(object):
 
     # TODO(okuta): Implement put
     # TODO(okuta): Implement repeat
-    # TODO(okuta): Implement choose
+
+    def choose(self, choices, out=None, mode='raise'):
+        return choose(self, choices, out, mode)
+
     # TODO(okuta): Implement sort
     # TODO(okuta): Implement argsort
     # TODO(okuta): Implement partition
@@ -1254,6 +1257,7 @@ mintypecode = numpy.mintypecode
 # Indexing routines
 # -----------------------------------------------------------------------------
 take = indexing.indexing.take
+choose = indexing.indexing.choose
 diagonal = indexing.indexing.diagonal
 
 # -----------------------------------------------------------------------------

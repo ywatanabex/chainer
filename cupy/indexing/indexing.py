@@ -64,7 +64,22 @@ def take(a, indices, axis=None, out=None):
     return _take_kernel(a, indices, cdim, rdim, out)
 
 
-# TODO(okuta): Implement choose
+def choose(a, choices, out=None, mode='raise'):
+    n = choices.shape[0]
+    n_channel = numpy.prod(choices.shape[1:])
+    if mode == 'raise':
+        if not ((a < n).all() and (0 <= a).all()):
+            raise ValueError('invalid entry in choice array')
+        c = _choose_kernel(a, choices, n_channel)
+    elif mode == 'wrap':
+        a = a % n
+        c = _choose_kernel(a, choices, n_channel)
+    elif mode == 'clip':
+        c = _choose_clip_kernel(a, choices, n_channel, n)
+    else:
+        raise TypeError('clipmode not understood')
+
+    return c
 
 
 # TODO(okuta): Implement compress
@@ -133,3 +148,23 @@ _take_kernel = elementwise.ElementwiseKernel(
       out = a[(li * cdim + indices) * rdim + ri];
     ''',
     'cupy_take')
+
+_choose_kernel = elementwise.ElementwiseKernel(
+    'S a, raw T choices, int32 n_channel',
+    'T y',
+    'y = choices[i + n_channel * a]',
+    'cupy_choose')
+
+_choose_clip_kernel = elementwise.ElementwiseKernel(
+    'S a, raw T choices, int32 n_channel, int32 n',
+    'T y',
+    '''
+      S x = a;
+      if (a < 0) {
+        x = 0;
+      } else if (a >= n) {
+        x = n - 1;
+      }
+      y = choices[i + n_channel * x];
+    ''',
+    'cupy_choose_clip')
