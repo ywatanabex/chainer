@@ -69,9 +69,9 @@ class NegativeSamplingFunction(function.Function):
             }
             T loss;
             if (f < 0) {
-              loss = __logf(1 + __expf(f));
+              loss = log1pf(__expf(f));
             } else {
-              loss = f + __logf(1 + __expf(-f));
+              loss = f + log1pf(__expf(-f));
             }
             y = loss;
             ''',
