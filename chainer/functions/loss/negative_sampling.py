@@ -133,9 +133,10 @@ class NegativeSamplingFunction(function.Function):
             'raw T g, raw T W, raw S k, int32 c, int32 m', 'T gx',
             '''
             int d = i / c;
+            int offset = i - d * c;
             T w = 0;
             for (int j = 0; j < m; ++j) {
-              w += g[d * m + j] * W[k[d * m + j] * c + i % c];
+              w += g[d * m + j] * W[k[d * m + j] * c + offset];
             }
             gx = w;
             ''',
