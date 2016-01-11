@@ -75,12 +75,12 @@ class NegativeSamplingFunction(function.Function):
             if (i % n_samples == 0) {
               f = -f;
             }
-            T loss;
-            if (f < 0) {
-              loss = log1pf(__expf(f));
-            } else {
-              loss = f + log1pf(__expf(-f));
+            T loss = 0;
+            if (f > 0) {
+              loss = f;
+              f = -f;
             }
+            loss += log1pf(__expf(f));
             y = loss;
             ''',
             'negative_sampling_forward_y'
