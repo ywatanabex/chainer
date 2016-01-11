@@ -14,7 +14,7 @@ from chainer.testing import condition
 
 class TestNegativeSampling(unittest.TestCase):
     def setUp(self):
-        self.link = links.NegativeSampling(3, [10, 5, 2, 5, 2], 2)
+        self.link = links.NegativeSampling(3, [10, 5, 2, 5, 2], 3)
         self.link.zerograds()
         self.x = numpy.random.uniform(-1, 1, (2, 3)).astype(numpy.float32)
         self.t = numpy.array([0, 2]).astype(numpy.int32)
