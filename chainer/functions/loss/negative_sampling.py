@@ -40,12 +40,11 @@ class NegativeSamplingFunction(function.Function):
         x, t, W = inputs
         self._make_samples(t)
 
-        loss = numpy.float32(0.0)
-        for ix, k in six.moves.zip(x, self.samples):
-            w = W[k]
-            f = w.dot(ix)
-            f[0] *= -1  # positive sample
-            loss += numpy.sum(numpy.logaddexp(f, 0))
+        self.wk = W.take(self.samples, axis=0)
+        ywx = numpy.einsum('ijk,ik->ij', self.wk, x)
+        self.ywx = ywx
+        ywx[:, 0] *= -1
+        loss = numpy.sum(numpy.logaddexp(ywx, 0))
         return numpy.array(loss, numpy.float32),
 
     def forward_gpu(self, inputs):
@@ -92,20 +91,18 @@ class NegativeSamplingFunction(function.Function):
         x, t, W = inputs
         gloss, = grads
 
-        gx = numpy.zeros_like(x)
+        g = gloss / (1 + numpy.exp(-self.ywx))
+        g[:, 0] *= -1
+        gx = numpy.einsum('ij,ijk->ik', g, self.wk)
         gW = numpy.zeros_like(W)
-        for i, (ix, k) in enumerate(six.moves.zip(x, self.samples)):
-            w = W[k]
-            f = w.dot(ix)
+        g_x = numpy.expand_dims(g, 2) * numpy.expand_dims(x, 1)
 
-            # g == -y * gloss / (1 + exp(yf))
-            f[0] *= -1
-            g = gloss / (1 + numpy.exp(-f))
-            g[0] *= -1
-
-            gx[i] = g.dot(w)
-            for ik, ig in six.moves.zip(k, g):
-                gW[ik] += ig * ix
+        # It is equivalent to `numpy.add.at(gW, self.samples, g_x)` but
+        # ufunc.at is too slow.
+        for isample, igx in six.moves.zip(
+                self.samples.reshape((self.samples.size,)),
+                g_x.reshape((self.samples.size, g_x.shape[2]))):
+            gW[isample] += igx
         return gx, None, gW
 
     def backward_gpu(self, inputs, grads):
