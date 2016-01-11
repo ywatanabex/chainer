@@ -145,7 +145,8 @@ class NegativeSamplingFunction(function.Function):
 
         gx = cupy.empty_like(x)
         cuda.elementwise(
-            'raw T g, raw T W, raw S s, int32 n_units, int32 n_samples', 'T gx',
+            'raw T g, raw T W, raw S s, int32 n_units, int32 n_samples',
+            'T gx',
             '''
             int b = i / n_units;
             int j = i - b * n_units;
