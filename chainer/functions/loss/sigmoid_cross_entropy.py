@@ -1,5 +1,6 @@
 import numpy
 
+import chainer
 from chainer import cuda
 from chainer import function
 from chainer.functions import sigmoid
@@ -29,6 +30,11 @@ class SigmoidCrossEntropy(function.Function):
     def forward(self, inputs):
         xp = cuda.get_array_module(*inputs)
         x, t = inputs
+        if chainer.DEBUG:
+            if not ((0 <= t).all() and
+                    (t < x.data.shape[1]).all()):
+                raise RuntimeError
+
         self.ignore_mask = (t != self.ignore_label)
         if self.normalize:
             count = int(self.ignore_mask.sum())

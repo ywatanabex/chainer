@@ -1,6 +1,7 @@
 import numpy
 import six
 
+import chainer
 from chainer import cuda
 from chainer import function
 from chainer.utils import type_check
@@ -67,8 +68,16 @@ class SoftmaxCrossEntropy(function.Function):
             x_type.shape[2:] == t_type.shape[1:],
         )
 
+    def _check_input_values(x, t):
+        if not ((0 <= t).all() and
+                (t < x.data.shape[1]).all()):
+            raise RuntimeError
+
     def forward_cpu(self, inputs):
         x, t = inputs
+        if chainer.DEBUG:
+            self._check_input_values(x, t)
+
         log_y = softmax_log(x, False)
         self.y = numpy.exp(log_y)
         log_yd = numpy.rollaxis(log_y, 1)
@@ -90,6 +99,9 @@ class SoftmaxCrossEntropy(function.Function):
     def forward_gpu(self, inputs):
         cupy = cuda.cupy
         x, t = inputs
+        if chainer.DEBUG:
+            self._check_input_values(x, t)
+
         log_y = softmax_log(x, self.use_cudnn)
         self.y = cupy.exp(log_y)
         if getattr(self, 'normalize', True):
