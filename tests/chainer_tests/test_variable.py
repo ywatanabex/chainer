@@ -405,8 +405,7 @@ class TestVariableBackwardError(unittest.TestCase):
                 return xp.array(1, np.float32),
 
             def backward(self, inputs, grads):
-                yp = np if xp is cuda.cupy else cuda.cupy
-                return yp.array([1], np.float32),
+                return [1]
 
         x = chainer.Variable(x_data)
         y = DummyFunction()(x)
@@ -416,6 +415,7 @@ class TestVariableBackwardError(unittest.TestCase):
     def test_type_mismatch_cpu(self):
         self.check_type_mismatch(self.x)
 
+    @attr.gpu
     def test_type_mismatch_gpu(self):
         self.check_type_mismatch(cuda.to_gpu(self.x))
 
@@ -439,6 +439,7 @@ class TestVariableBackwardError(unittest.TestCase):
     def test_dtype_mismatch_cpu(self):
         self.check_dtype_mismatch(self.x)
 
+    @attr.gpu
     def test_dtype_mismatch_gpu(self):
         self.check_dtype_mismatch(cuda.to_gpu(self.x))
 
@@ -462,6 +463,7 @@ class TestVariableBackwardError(unittest.TestCase):
     def test_shape_mismatch_cpu(self):
         self.check_shape_mismatch(self.x)
 
+    @attr.gpu
     def test_shape_mismatch_gpu(self):
         self.check_shape_mismatch(cuda.to_gpu(self.x))
 
