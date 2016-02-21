@@ -89,6 +89,7 @@ MODULES = [
             'cupy.cuda.device',
             'cupy.cuda.driver',
             'cupy.cuda.memory',
+            'cupy.cuda.profiler',
             'cupy.cuda.function',
             'cupy.cuda.runtime',
             'cupy.util',
@@ -96,6 +97,7 @@ MODULES = [
         'include': [
             'cublas_v2.h',
             'cuda.h',
+            'cuda_profiler_api.h',
             'cuda_runtime.h',
             'curand.h',
         ],
