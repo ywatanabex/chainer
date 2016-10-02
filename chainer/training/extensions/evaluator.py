@@ -10,6 +10,13 @@ from chainer.training import extension
 from chainer import variable
 
 
+def _convert_to_cv(x, volatile='off'):
+        if isinstance(x, list):
+                    return [variable.Variable(xi, volatile=volatile) for xi in x]
+        else:
+                    return variable.Variable(x, volatile=volatile) 
+
+
 class Evaluator(extension.Extension):
 
     """Trainer extension to evaluate models on a validation set.
@@ -170,15 +177,15 @@ class Evaluator(extension.Extension):
             with reporter_module.report_scope(observation):
                 in_arrays = self.converter(batch, self.device)
                 if isinstance(in_arrays, tuple):
-                    in_vars = tuple(variable.Variable(x, volatile='on')
+                    in_vars = tuple(_convert_to_cv(x, volatile='on')
                                     for x in in_arrays)
                     eval_func(*in_vars)
                 elif isinstance(in_arrays, dict):
-                    in_vars = {key: variable.Variable(x, volatile='on')
+                    in_vars = {key: _convert_to_cv(x, volatile='on')
                                for key, x in six.iteritems(in_arrays)}
                     eval_func(**in_vars)
                 else:
-                    in_var = variable.Variable(in_arrays, volatile='on')
+                    in_var = _convert_to_cv(in_arrays, volatile='on')
                     eval_func(in_var)
 
             summary.add(observation)
