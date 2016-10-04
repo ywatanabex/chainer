@@ -4,6 +4,18 @@ from chainer import cuda
 from chainer import function
 from chainer.utils import type_check
 
+def _transpose_lengths(lengths):
+    dl = []
+    for l0, l1 in zip(lengths, lengths[1:]):
+        dl.append(l0 -l1)
+    dl.append(lengths[-1])
+    dl.reverse()
+    l = len(lengths)
+    t_lengths = []    
+    for d in dl:
+        t_lengths += [l] * d
+        l -= 1
+    return t_lengths
 
 def _transpose(xs, length):
     if length == 0:
@@ -76,6 +88,14 @@ class TransposeSequence(function.Function):
         return _transpose(xs, len(xs[0]))
 
     def backward(self, xs, gs):
+        gs = list(gs)
+        gs0 = [gsi for gsi in gs if gsi is not None][0]
+        gs_shape = gs0.shape[1:]
+        xp = cuda.get_array_module(gs0)
+        t_lengths = _transpose_lengths(map(len, xs))
+        for i, l in enumerate(t_lengths):
+            if gs[i] is None:
+                gs[i] = xp.zeros((l,) + gs_shape, dtype=gs0.dtype)
         return _transpose(gs, len(xs))
 
 
