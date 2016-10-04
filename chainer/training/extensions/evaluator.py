@@ -12,7 +12,7 @@ from chainer import variable
 
 def _convert_to_cv(x, volatile='off'):
         if isinstance(x, list):
-                    return [variable.Variable(xi, volatile=volatile) for xi in x]
+                    return [_convert_to_cv(xi, volatile=volatile) for xi in x]
         else:
                     return variable.Variable(x, volatile=volatile) 
 
