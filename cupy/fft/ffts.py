@@ -1,5 +1,5 @@
 import cupy
-import cufft
+from cupy.cuda import cufft
 
 CUFFT_C2C = 0x29
 CUFFT_FORWARD = -1
@@ -12,6 +12,7 @@ CUFFT_C2C = 0x29
 
 
 def fft(a):
+    a = a.astype('complex64')
     out = cupy.empty_like(a)
     n, d = a.shape
     plan = cufft.plan1d(d, CUFFT_C2C, n)
@@ -19,10 +20,12 @@ def fft(a):
     return out
 
 
-def fft(a):
+def ifft(a):
+    a = a.astype('complex64')
     out = cupy.empty_like(a)
     n, d = a.shape
     plan = cufft.plan1d(d, CUFFT_C2C, n)
     cufft.execC2C(plan, a.data.ptr, out.data.ptr, CUFFT_INVERSE)
+    out /= d
     return out
 

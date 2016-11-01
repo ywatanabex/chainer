@@ -7,6 +7,7 @@ from cupy.cuda import memory
 from cupy.cuda import profiler
 from cupy.cuda import stream
 
+
 compile_with_cache = compiler.compile_with_cache
 
 Device = device.Device
