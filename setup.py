@@ -75,7 +75,7 @@ setup(
               'cupy.statistics',
               'cupy.testing'],
     package_data={
-        'cupy': ['core/carray.cuh'],
+        'cupy': ['core/carray.cuh', 'core/complex.cuh'],
     },
     zip_safe=False,
     setup_requires=setup_requires,
