@@ -40,6 +40,7 @@ cdef extern from "cufft.h":
 
     cufftResult cufftPlan1d(cufftHandle *plan, int nx, cufftType type, int batch)
     cufftResult cufftExecC2C(cufftHandle plan, cufftComplex *idata, cufftComplex *odata, int direction)
+    cufftResult cufftDestroy(cufftHandle plan)
 
 
 
@@ -92,7 +93,7 @@ cpdef size_t plan1d(int nx, cufftType type, int batch) except *:
     return <size_t>plan
 
 
-cpdef execC2C(
-    cufftHandle plan, size_t idata, size_t odata, int direction):
+cpdef execC2C(cufftHandle plan, size_t idata, size_t odata, int direction):
     status = cufftExecC2C(plan, <cufftComplex*> idata, <cufftComplex*> odata, direction)
+    cufftDestroy(plan)
     check_status(status)

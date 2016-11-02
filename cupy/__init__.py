@@ -29,6 +29,7 @@ from cupy import sorting
 from cupy import statistics
 from cupy import testing  # NOQA
 from cupy import util
+from cupy import fft
 
 cupy_complex_available = core.core.cupy_complex_available
 

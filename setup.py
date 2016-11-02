@@ -73,7 +73,8 @@ setup(
               'cupy.random',
               'cupy.sorting',
               'cupy.statistics',
-              'cupy.testing'],
+              'cupy.testing',
+              'cupy.fft'],
     package_data={
         'cupy': ['core/carray.cuh', 'core/complex.cuh'],
     },
