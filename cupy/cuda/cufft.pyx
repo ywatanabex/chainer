@@ -38,9 +38,9 @@ cdef extern from "cufft.h":
         CUFFT_Z2D
         CUFFT_Z2Z
 
-    cufftResult cufftPlan1d(cufftHandle *plan, int nx, cufftType type, int batch)
-    cufftResult cufftExecC2C(cufftHandle plan, cufftComplex *idata, cufftComplex *odata, int direction)
-    cufftResult cufftDestroy(cufftHandle plan)
+    cufftResult cufftPlan1d(cufftHandle *plan, int nx, cufftType type, int batch)  nogil
+    cufftResult cufftExecC2C(cufftHandle plan, cufftComplex *idata, cufftComplex *odata, int direction)  nogil
+    cufftResult cufftDestroy(cufftHandle plan)  nogil
 
 
 
@@ -89,7 +89,8 @@ cpdef inline check_status(int status):
 
 cpdef size_t plan1d(int nx, cufftType type, int batch) except *:
     cdef cufftHandle plan
-    cufftPlan1d(&plan, nx, type, batch)
+    status = cufftPlan1d(&plan, nx, type, batch)
+    check_status(status)
     return <size_t>plan
 
 
