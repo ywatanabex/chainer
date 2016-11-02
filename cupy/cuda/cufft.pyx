@@ -38,9 +38,12 @@ cdef extern from "cufft.h":
         CUFFT_Z2D
         CUFFT_Z2Z
 
+    cufftResult cufftCreate(cufftHandle * handle) nogil
+    cufftResult cufftDestroy(cufftHandle plan)  nogil
+    cufftResult cufftMakePlan1d(cufftHandle plan, int nx, cufftType type, int batch, size_t *workSize) nogil
     cufftResult cufftPlan1d(cufftHandle *plan, int nx, cufftType type, int batch)  nogil
     cufftResult cufftExecC2C(cufftHandle plan, cufftComplex *idata, cufftComplex *odata, int direction)  nogil
-    cufftResult cufftDestroy(cufftHandle plan)  nogil
+
 
 
 
@@ -85,7 +88,19 @@ cpdef inline check_status(int status):
 # Extern
 ###############################################################################
 
+cpdef create():
+    cdef cufftHandle handle
+    status = cufftCreate(&handle)
+    return <size_t>handle
 
+cpdef destroy(cufftHandle plan):
+    cufftDestroy(plan)    
+
+cpdef size_t makePlan1d(cufftHandle plan, int nx, cufftType type, int batch) except *:
+    cdef size_t workSize
+    status = cufftMakePlan1d(plan, nx, type, batch, &workSize)
+    check_status(status)
+    return <size_t>workSize
 
 cpdef size_t plan1d(int nx, cufftType type, int batch) except *:
     cdef cufftHandle plan
@@ -96,5 +111,6 @@ cpdef size_t plan1d(int nx, cufftType type, int batch) except *:
 
 cpdef execC2C(cufftHandle plan, size_t idata, size_t odata, int direction):
     status = cufftExecC2C(plan, <cufftComplex*> idata, <cufftComplex*> odata, direction)
-    cufftDestroy(plan)
     check_status(status)
+
+

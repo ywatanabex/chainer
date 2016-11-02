@@ -15,8 +15,11 @@ def fft(a):
     a = a.astype('complex64')
     out = cupy.empty_like(a)
     n, d = a.shape
-    plan = cufft.plan1d(d, CUFFT_C2C, n)
+    #plan = cufft.plan1d(d, CUFFT_C2C, n)
+    plan = cufft.create()
+    cufft.makePlan1d(plan, d, CUFFT_C2C, n)
     cufft.execC2C(plan, a.data.ptr, out.data.ptr, CUFFT_FORWARD)
+    cufft.destroy(plan)
     return out
 
 
@@ -24,8 +27,11 @@ def ifft(a):
     a = a.astype('complex64')
     out = cupy.empty_like(a)
     n, d = a.shape
-    plan = cufft.plan1d(d, CUFFT_C2C, n)
+    #plan = cufft.plan1d(d, CUFFT_C2C, n)
+    plan = cufft.create()
+    cufft.makePlan1d(plan, d, CUFFT_C2C, n)
     cufft.execC2C(plan, a.data.ptr, out.data.ptr, CUFFT_INVERSE)
+    cufft.destroy(plan)
     out /= d
     return out
 
