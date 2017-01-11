@@ -11,10 +11,12 @@ from chainer import variable
 
 
 def _convert_to_cv(x, volatile='off'):
-        if isinstance(x, list):
-                    return [_convert_to_cv(xi, volatile=volatile) for xi in x]
-        else:
-                    return variable.Variable(x, volatile=volatile) 
+    if isinstance(x, list):
+        return [_convert_to_cv(xi, volatile=volatile) for xi in x]
+    elif isinstance(x, dict):
+        return x
+    else:
+        return variable.Variable(x, volatile=volatile) 
 
 
 class Evaluator(extension.Extension):
