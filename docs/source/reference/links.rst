@@ -100,6 +100,11 @@ NStepBiLSTM
 .. autoclass:: NStepBiLSTM
   :members:
 
+NStepBiGRU
+~~~~~~~~~~
+ .. autoclass:: NStepBiGRU
+    :members:
+
 NStepBiRNNReLU
 ~~~~~~~~~~~~~~
 .. autoclass:: NStepBiRNNReLU
@@ -108,6 +113,11 @@ NStepBiRNNReLU
 NStepBiRNNTanh
 ~~~~~~~~~~~~~~
 .. autoclass:: NStepBiRNNTanh
+  :members:
+
+NStepGRU
+~~~~~~~~
+.. autoclass:: NStepGRU
   :members:
 
 NStepLSTM
