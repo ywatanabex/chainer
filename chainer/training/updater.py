@@ -6,6 +6,13 @@ from chainer.dataset import iterator as iterator_module
 from chainer import variable
 
 
+def _convert_to_cv(x, volatile='off'):
+    if isinstance(x, list):
+        return [_convert_to_cv(xi, volatile=volatile) for xi in x]
+    else:
+        return variable.Variable(x, volatile=volatile)
+
+
 class Updater(object):
 
     """Interface of updater objects for trainers.
@@ -185,14 +192,14 @@ class StandardUpdater(Updater):
         loss_func = self.loss_func or optimizer.target
 
         if isinstance(in_arrays, tuple):
-            in_vars = tuple(variable.Variable(x) for x in in_arrays)
+            in_vars = tuple(_convert_to_cv(x) for x in in_arrays)
             optimizer.update(loss_func, *in_vars)
         elif isinstance(in_arrays, dict):
-            in_vars = {key: variable.Variable(x)
+            in_vars = {key: _convert_to_cv(x)
                        for key, x in six.iteritems(in_arrays)}
             optimizer.update(loss_func, **in_vars)
         else:
-            in_var = variable.Variable(in_arrays)
+            in_var = _convert_to_cv(in_arrays)
             optimizer.update(loss_func, in_var)
 
     def serialize(self, serializer):
@@ -306,14 +313,14 @@ class ParallelUpdater(StandardUpdater):
             loss_func = self.loss_func or model
 
             if isinstance(in_arrays, tuple):
-                in_vars = tuple(variable.Variable(x) for x in in_arrays)
+                in_vars = tuple(_convert_to_cv(x) for x in in_arrays)
                 losses.append(loss_func(*in_vars))
             elif isinstance(in_arrays, dict):
-                in_vars = {key: variable.Variable(x)
+                in_vars = {key: _convert_to_cv(x)
                            for key, x in six.iteritems(in_arrays)}
                 losses.append(loss_func(**in_vars))
             else:
-                in_vars = variable.Variable(in_arrays)
+                in_vars = _convert_to_cv(in_arrays)
                 losses.append(loss_func(in_vars))
 
         # For _uninitialized_params
