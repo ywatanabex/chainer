@@ -95,8 +95,8 @@ MLPConvolution2D
 .. autoclass:: MLPConvolution2D
    :members:
 
- NStepBiGRU
- ~~~~~~~~~~
+NStepBiGRU
+~~~~~~~~~~
  .. autoclass:: NStepBiGRU
     :members:
 
